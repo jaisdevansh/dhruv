@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Artwork } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const defaultArtworks = [
@@ -86,7 +87,7 @@ export async function getPortfolioData() {
     return {
       artistName: config.artistName,
       accentColor: config.accentColor,
-      artworks: artworks.map(w => ({
+      artworks: artworks.map((w: Artwork) => ({
         id: w.id,
         title: w.title,
         medium: w.medium,
