@@ -7,7 +7,7 @@ const defaultArtworks = [
   {
     title: "Ethereal Silence",
     medium: "Oil on Canvas",
-    image: "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?q=80&w=1972&auto=format&fit=crop",
+    image: "/images/artwork1.jpg",
     year: "2024",
     dimensions: "36 x 48 inches",
     location: "Mumbai Gallery",
@@ -16,7 +16,7 @@ const defaultArtworks = [
   {
     title: "Urban Decay",
     medium: "Charcoal & Acrylic",
-    image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1945&auto=format&fit=crop",
+    image: "/images/artwork2.jpg",
     year: "2023",
     dimensions: "40 x 40 inches",
     location: "Studio Collection",
@@ -25,7 +25,7 @@ const defaultArtworks = [
   {
     title: "Neon Synthesis",
     medium: "Digital Art / Giclée",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop",
+    image: "/images/artwork3.jpg",
     year: "2024",
     dimensions: "30 x 45 inches",
     location: "Digital Archives",
@@ -34,7 +34,7 @@ const defaultArtworks = [
   {
     title: "Primal Shadows",
     medium: "Mixed Media & Gold Leaf",
-    image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=2070&auto=format&fit=crop",
+    image: "/images/artwork4.jpg",
     year: "2023",
     dimensions: "24 x 36 inches",
     location: "Private Collector (Delhi)",
@@ -43,7 +43,7 @@ const defaultArtworks = [
   {
     title: "Architectural Mirage",
     medium: "Giclée on Archival Paper",
-    image: "https://images.unsplash.com/photo-1551918120-9739cb430c6d?q=80&w=1974&auto=format&fit=crop",
+    image: "/images/artwork5.jpg",
     year: "2024",
     dimensions: "36 x 36 inches",
     location: "London Exhibition Hall",

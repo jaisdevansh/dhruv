@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Image from "next/image";
 import { usePortfolio } from "@/components/providers/portfolio-context";
+import heroBg from "../../../public/images/hero-bg.jpg";
 
 const title1 = "FINE ART";
 const title2 = "EXHIBITION";
@@ -124,10 +125,11 @@ export function Hero() {
 
         {/* Ambient background artwork */}
         <Image
-          src="https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=2560&auto=format&fit=crop"
+          src={heroBg}
           alt="Ambient background artwork"
           fill
           priority
+          placeholder="blur"
           sizes="100vw"
           className="object-cover mix-blend-luminosity opacity-[0.15] scale-105 select-none pointer-events-none"
         />
