@@ -3,7 +3,10 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { Navbar } from "@/components/layout/navbar";
 import { PortfolioProvider, ThemeStyles } from "@/components/providers/portfolio-context";
+import { getPortfolioData } from "@/app/actions";
 import "./globals.css";
+
+export const dynamic = "force-dynamic";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,11 +23,14 @@ export const metadata: Metadata = {
   description: "Awwwards-Level Fine Arts Portfolio by Dhruv Chaurasia",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // SSR: fetch real data on the server before sending HTML to browser
+  const initialData = await getPortfolioData();
+
   return (
     <html
       lang="en"
@@ -32,7 +38,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-[var(--color-background)] relative" suppressHydrationWarning>
-        <PortfolioProvider>
+        <PortfolioProvider initialData={initialData}>
           <ThemeStyles />
           {/* Grain overlay for luxury feel */}
           <div className="noise-bg" />

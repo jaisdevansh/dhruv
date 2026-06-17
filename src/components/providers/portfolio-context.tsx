@@ -1,13 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import {
-  getPortfolioData,
   updateArtistName,
   updateAccentColor,
   addDbArtwork,
   editDbArtwork,
   deleteDbArtwork,
+  getPortfolioData,
 } from "@/app/actions";
 
 export interface Artwork {
@@ -85,34 +85,30 @@ const defaultArtworks: Artwork[] = [
   },
 ];
 
+interface InitialData {
+  artistName: string;
+  accentColor: string;
+  artworks: Artwork[];
+}
+
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
-export function PortfolioProvider({ children }: { children: React.ReactNode }) {
-  const [artistName, setArtistNameState] = useState("Dhruv Chaurasia");
-  const [accentColor, setAccentColorState] = useState("#D4AF37");
-  const [artworks, setArtworksState] = useState<Artwork[]>([]);
-  const [hydrated, setHydrated] = useState(false);
-
-  // Load from Neon Database
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await getPortfolioData();
-        setArtistNameState(data.artistName);
-        setAccentColorState(data.accentColor);
-        setArtworksState(data.artworks);
-      } catch (e) {
-        console.error("Failed to load portfolio database data", e);
-        setArtworksState(defaultArtworks);
-      }
-      setHydrated(true);
-    };
-
-    const frame = requestAnimationFrame(() => {
-      loadData();
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
+export function PortfolioProvider({
+  children,
+  initialData,
+}: {
+  children: React.ReactNode;
+  initialData?: InitialData;
+}) {
+  const [artistName, setArtistNameState] = useState(
+    initialData?.artistName ?? "Dhruv Chaurasia"
+  );
+  const [accentColor, setAccentColorState] = useState(
+    initialData?.accentColor ?? "#D4AF37"
+  );
+  const [artworks, setArtworksState] = useState<Artwork[]>(
+    initialData?.artworks ?? []
+  );
 
   // Update Database & Local State helper wrappers
   const setArtistName = async (name: string) => {
@@ -167,9 +163,9 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   return (
     <PortfolioContext.Provider
       value={{
-        artistName: hydrated ? artistName : "Dhruv Chaurasia",
-        accentColor: hydrated ? accentColor : "#D4AF37",
-        artworks: hydrated ? artworks : defaultArtworks,
+        artistName,
+        accentColor,
+        artworks,
         setArtistName,
         setAccentColor,
         addArtwork,
