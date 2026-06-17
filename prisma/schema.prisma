@@ -1,0 +1,28 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model PortfolioConfig {
+  id          Int      @id @default(1)
+  artistName  String   @default("Dhruv Chaurasia")
+  accentColor String   @default("#D4AF37")
+  updatedAt   DateTime @updatedAt
+}
+
+model Artwork {
+  id          Int      @id @default(autoincrement())
+  title       String
+  medium      String
+  image       String
+  year        String
+  dimensions  String   @default("30 x 40 inches")
+  location    String   @default("Artist Studio")
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
