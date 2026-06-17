@@ -8,10 +8,11 @@ generator client {
 }
 
 model PortfolioConfig {
-  id          Int      @id @default(1)
-  artistName  String   @default("Dhruv Chaurasia")
-  accentColor String   @default("#D4AF37")
-  updatedAt   DateTime @updatedAt
+  id           Int      @id @default(1)
+  artistName   String   @default("Dhruv Chaurasia")
+  accentColor  String   @default("#D4AF37")
+  passwordHash String   @default("c30d9c4c7c88b02c81fb3b9288e404b92b604e0e2ad0fb498b8433ad9fb1f71a")
+  updatedAt    DateTime @updatedAt
 }
 
 model Artwork {

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { usePortfolio, Artwork } from "@/components/providers/portfolio-context";
 import Link from "next/link";
 import Image from "next/image";
+import { verifyAdminPassword, changeAdminPassword } from "@/app/actions";
 import { 
   Lock, 
   ChevronLeft, 
@@ -15,7 +16,8 @@ import {
   Check, 
   X,
   LogOut,
-  FolderOpen
+  FolderOpen,
+  KeyRound
 } from "lucide-react";
 
 const colorPresets = [
@@ -59,6 +61,13 @@ export default function AdminPage() {
 
   // Edit Mode state
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  // Change Password State
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
   const [editTitle, setEditTitle] = useState("");
   const [editMedium, setEditMedium] = useState("");
   const [editImage, setEditImage] = useState("");
@@ -76,9 +85,10 @@ export default function AdminPage() {
   }, [artistName]);
 
   // Handle Admin Authorization
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode === "dhruv123") {
+    const isValid = await verifyAdminPassword(passcode);
+    if (isValid) {
       setIsAuthenticated(true);
       setLoginError("");
       // Persist auth state during tab session
@@ -111,6 +121,58 @@ export default function AdminPage() {
       setArtistName(nameInput.trim());
       setNameSaved(true);
       setTimeout(() => setNameSaved(false), 3000);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError("");
+    setPasswordSuccess("");
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+
+    if (newPassword.length < 4) {
+      setPasswordError("New passcode must be at least 4 characters.");
+      return;
+    }
+
+    const res = await changeAdminPassword(oldPassword, newPassword);
+    if (res.success) {
+      setPasswordSuccess("Passcode updated successfully!");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } else {
+      setPasswordError(res.error || "Failed to change passcode.");
+    }
+  };
+
+  const handleNewImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setNewImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setEditImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -354,6 +416,83 @@ export default function AdminPage() {
               </div>
             </div>
 
+            {/* 3. Security Settings (Change Password) */}
+            <div className="bg-[#0a0a0a]/90 border border-white/[0.05] rounded-3xl p-6 md:p-8 space-y-6">
+              <div className="flex items-center gap-3 border-b border-white/[0.05] pb-4">
+                <div className="p-2 bg-white/[0.03] text-[var(--color-accent)] rounded-lg">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-heading font-bold uppercase tracking-wider text-white">
+                  Security Settings
+                </h2>
+              </div>
+
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <p className="text-xs text-[var(--color-muted)] font-sans leading-relaxed">
+                  Update your admin access portal passcode. This change persists in the database.
+                </p>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                    Current Passcode
+                  </label>
+                  <input
+                    type="password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] focus:border-[var(--color-accent)] rounded-lg focus:outline-none transition-all duration-300 text-sm font-sans"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                    New Passcode
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] focus:border-[var(--color-accent)] rounded-lg focus:outline-none transition-all duration-300 text-sm font-sans"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                    Confirm New Passcode
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] focus:border-[var(--color-accent)] rounded-lg focus:outline-none transition-all duration-300 text-sm font-sans"
+                    required
+                  />
+                </div>
+
+                {passwordError && (
+                  <p className="text-red-500 text-xs font-sans tracking-wide">
+                    {passwordError}
+                  </p>
+                )}
+
+                {passwordSuccess && (
+                  <p className="text-green-500 text-xs font-sans tracking-wide">
+                    {passwordSuccess}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-white hover:bg-[var(--color-accent)] text-[#030303] rounded-lg transition-all duration-300 font-sans font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                >
+                  <Lock className="w-4 h-4" />
+                  Update Passcode
+                </button>
+              </form>
+            </div>
+
           </div>
 
           {/* Right Column: Artworks Manager (Add & List) */}
@@ -399,18 +538,69 @@ export default function AdminPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <label className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
-                    Image URL
+                    Artwork Image
                   </label>
-                  <input
-                    type="url"
-                    value={newImage}
-                    onChange={(e) => setNewImage(e.target.value)}
-                    placeholder="Unsplash URL or file path"
-                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] focus:border-[var(--color-accent)] rounded-lg focus:outline-none transition-all duration-300 text-sm font-sans"
-                    required
-                  />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Upload Box */}
+                    <div className="md:col-span-2">
+                      <div className="relative border border-dashed border-white/10 hover:border-[var(--color-accent)] bg-white/[0.01] hover:bg-white/[0.02] rounded-xl p-5 transition-all flex flex-col items-center justify-center min-h-[120px] cursor-pointer group">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleNewImageFile}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <FolderOpen className="w-6 h-6 text-zinc-500 group-hover:text-[var(--color-accent)] mb-2 transition-colors" />
+                        <span className="text-xs text-zinc-400 font-sans font-bold uppercase tracking-wider">
+                          Upload Local Image File
+                        </span>
+                        <span className="text-[10px] text-zinc-600 font-sans mt-1">
+                          Drag & drop or click to browse
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Presets / Selected Preview */}
+                    <div className="md:col-span-1 bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 flex flex-col items-center justify-center relative min-h-[120px]">
+                      {newImage ? (
+                        <div className="relative w-full h-full min-h-[90px] flex flex-col items-center justify-center">
+                          <img
+                            src={newImage}
+                            alt="Preview"
+                            className="max-h-[80px] object-contain rounded border border-white/10 mb-2"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setNewImage("")}
+                            className="text-[9px] uppercase tracking-wider font-bold text-red-500 hover:text-red-400 font-sans"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-center space-y-2">
+                          <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold block">
+                            Or Select Preset
+                          </span>
+                          <select
+                            onChange={(e) => setNewImage(e.target.value)}
+                            value={newImage}
+                            className="bg-[#030303] border border-white/10 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none focus:border-[var(--color-accent)] font-sans"
+                          >
+                            <option value="">-- Presets --</option>
+                            <option value="/images/artwork1.jpg">Artwork 1 (Oil)</option>
+                            <option value="/images/artwork2.jpg">Artwork 2 (Charcoal)</option>
+                            <option value="/images/artwork3.jpg">Artwork 3 (Digital)</option>
+                            <option value="/images/artwork4.jpg">Artwork 4 (Mixed)</option>
+                            <option value="/images/artwork5.jpg">Artwork 5 (Giclée)</option>
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -542,14 +732,35 @@ export default function AdminPage() {
                                   className="w-full px-3 py-2 bg-white/[0.03] border border-white/10 focus:border-[var(--color-accent)] rounded-lg focus:outline-none text-white text-xs font-sans"
                                 />
                               </div>
-                              <div className="space-y-1">
-                                <label className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Image URL</label>
-                                <input
-                                  type="text"
-                                  value={editImage}
-                                  onChange={(e) => setEditImage(e.target.value)}
-                                  className="w-full px-3 py-2 bg-white/[0.03] border border-white/10 focus:border-[var(--color-accent)] rounded-lg focus:outline-none text-white text-xs font-sans"
-                                />
+                              <div className="space-y-1 md:col-span-2">
+                                <label className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Artwork Image</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
+                                  <div className="relative border border-dashed border-white/10 hover:border-[var(--color-accent)] bg-white/[0.01] hover:bg-white/[0.02] rounded-lg p-2 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={handleEditImageFile}
+                                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    />
+                                    <FolderOpen className="w-4 h-4 text-zinc-500" />
+                                    <span className="text-[10px] text-zinc-400 font-sans font-bold uppercase tracking-wider">
+                                      Upload File
+                                    </span>
+                                  </div>
+                                  
+                                  <select
+                                    onChange={(e) => setEditImage(e.target.value)}
+                                    value={editImage.startsWith("data:") ? "" : editImage}
+                                    className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:outline-none focus:border-[var(--color-accent)] font-sans"
+                                  >
+                                    <option value="">-- Custom/Uploaded --</option>
+                                    <option value="/images/artwork1.jpg">Preset 1 (Oil)</option>
+                                    <option value="/images/artwork2.jpg">Preset 2 (Charcoal)</option>
+                                    <option value="/images/artwork3.jpg">Preset 3 (Digital)</option>
+                                    <option value="/images/artwork4.jpg">Preset 4 (Mixed)</option>
+                                    <option value="/images/artwork5.jpg">Preset 5 (Giclée)</option>
+                                  </select>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <label className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Year</label>

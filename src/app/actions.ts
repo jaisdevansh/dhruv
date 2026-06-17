@@ -3,6 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { Artwork } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { createHash } from "crypto";
+
+function hashPassword(password: string): string {
+  return createHash("sha256").update(password).digest("hex");
+}
 
 const defaultArtworks = [
   {
@@ -215,3 +220,55 @@ export async function deleteDbArtwork(id: number) {
     return { success: false, error: String(error) };
   }
 }
+
+export async function verifyAdminPassword(password: string): Promise<boolean> {
+  try {
+    const config = await prisma.portfolioConfig.findUnique({
+      where: { id: 1 }
+    });
+    
+    // Default fallback is the hash of the ENV variable or "dhruv123"
+    const defaultPass = process.env.ADMIN_PASSWORD || "dhruv123";
+    const expectedHash = config?.passwordHash || hashPassword(defaultPass);
+    
+    return hashPassword(password) === expectedHash;
+  } catch (error) {
+    console.error("Error verifying admin password:", error);
+    const fallbackPassword = process.env.ADMIN_PASSWORD || "dhruv123";
+    return password === fallbackPassword;
+  }
+}
+
+export async function changeAdminPassword(oldPassword: string, newPassword: string) {
+  try {
+    const config = await prisma.portfolioConfig.findUnique({
+      where: { id: 1 }
+    });
+    
+    const defaultPass = process.env.ADMIN_PASSWORD || "dhruv123";
+    const currentHash = config?.passwordHash || hashPassword(defaultPass);
+    
+    if (hashPassword(oldPassword) !== currentHash) {
+      return { success: false, error: "Incorrect current passcode." };
+    }
+
+    const newHash = hashPassword(newPassword);
+    
+    await prisma.portfolioConfig.upsert({
+      where: { id: 1 },
+      update: { passwordHash: newHash },
+      create: { 
+        id: 1, 
+        passwordHash: newHash,
+        artistName: "Dhruv Chaurasia",
+        accentColor: "#D4AF37"
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to change admin password:", error);
+    return { success: false, error: String(error) };
+  }
+}
+
