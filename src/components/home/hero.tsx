@@ -1,18 +1,15 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import Image from "next/image";
+import { m as motion, LazyMotion, domAnimation, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { CldImage } from "next-cloudinary";
 import { usePortfolio } from "@/components/providers/portfolio-context";
-import heroBg from "../../../public/images/hero-bg.jpg";
-
 const title1 = "FINE ART";
 const title2 = "EXHIBITION";
 
 export function Hero() {
   const { artistName } = usePortfolio();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
 
   // Mouse tracking for 3D tilt effect on the background and grid
   const mouseX = useMotionValue(0);
@@ -32,8 +29,8 @@ export function Hero() {
   const glowX = useTransform(springX, [-0.5, 0.5], ["30%", "70%"]);
   const glowY = useTransform(springY, [-0.5, 0.5], ["30%", "70%"]);
 
+
   useEffect(() => {
-    setMounted(true);
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -73,36 +70,12 @@ export function Hero() {
     },
   };
 
-  if (!mounted) {
-    return (
+  return (
+    <LazyMotion features={domAnimation}>
       <section
         ref={containerRef}
         className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-[var(--color-background)]"
       >
-        <div className="absolute inset-4 md:inset-8 z-0 rounded-3xl overflow-hidden bg-gradient-to-br from-white/[0.01] to-white/[0.03] border border-white/[0.03]" />
-        <div className="relative z-10 flex flex-col items-center justify-center w-full px-6 text-center select-none pointer-events-none">
-          <span className="text-xs font-sans tracking-[0.4em] text-[var(--color-accent)] uppercase mb-6">
-            FINE ART BY DHRUV CHAURASIA
-          </span>
-          <h1 className="font-heading text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black tracking-tighter text-[var(--color-foreground)] uppercase leading-none">
-            FINE ART
-          </h1>
-          <h1 className="font-heading text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black tracking-tighter text-[var(--color-accent)] uppercase leading-none mt-2">
-            EXHIBITION
-          </h1>
-          <p className="mt-10 text-xs md:text-sm tracking-[0.25em] uppercase text-[var(--color-muted)] max-w-md font-sans leading-relaxed">
-            Exploring the friction between urban raw decay and ethereal modern synthesis.
-          </p>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section
-      ref={containerRef}
-      className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-[var(--color-background)]"
-    >
       {/* 3D Parallax Background Card */}
       <motion.div
         style={{
@@ -123,14 +96,15 @@ export function Hero() {
           className="absolute -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.08)_0%,rgba(0,0,0,0)_70%)] pointer-events-none z-10"
         />
 
-        {/* Ambient background artwork */}
-        <Image
-          src={heroBg}
+        {/* Ambient background artwork via Cloudinary for massive performance boost */}
+        <CldImage
+          src="portfolio/hero-bg"
           alt="Ambient background artwork"
           fill
           priority
-          placeholder="blur"
           sizes="100vw"
+          format="auto"
+          quality="auto"
           className="object-cover mix-blend-luminosity opacity-[0.15] scale-105 select-none pointer-events-none"
         />
 
@@ -229,7 +203,8 @@ export function Hero() {
           />
         </div>
       </motion.div>
-    </section>
+      </section>
+    </LazyMotion>
   );
 }
 

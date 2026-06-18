@@ -567,6 +567,7 @@ export default function AdminPage() {
                     <div className="md:col-span-1 bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 flex flex-col items-center justify-center relative min-h-[120px]">
                       {newImage ? (
                         <div className="relative w-full h-full min-h-[90px] flex flex-col items-center justify-center">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={newImage}
                             alt="Preview"

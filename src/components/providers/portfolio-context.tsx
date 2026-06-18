@@ -32,58 +32,7 @@ interface PortfolioContextType {
   deleteArtwork: (id: number) => Promise<void>;
 }
 
-const defaultArtworks: Artwork[] = [
-  {
-    id: 1,
-    title: "Ethereal Silence",
-    medium: "Oil on Canvas",
-    image: "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?q=80&w=1972&auto=format&fit=crop",
-    year: "2024",
-    dimensions: "36 x 48 inches",
-    location: "Mumbai Gallery",
-    description: "Captures a landscape of total quietude, using detailed oil layering to create soft light transitions. The composition invites the viewer to reflect on transient spaces."
-  },
-  {
-    id: 2,
-    title: "Urban Decay",
-    medium: "Charcoal & Acrylic",
-    image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1945&auto=format&fit=crop",
-    year: "2023",
-    dimensions: "40 x 40 inches",
-    location: "Studio Collection",
-    description: "An intense exploration of texture and contrast, depicting architectural structures crumbling into abstraction. Charcoal is layered with raw acrylic gestures."
-  },
-  {
-    id: 3,
-    title: "Neon Synthesis",
-    medium: "Digital Art / Giclée",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop",
-    year: "2024",
-    dimensions: "30 x 45 inches",
-    location: "Digital Archives",
-    description: "A hybrid piece synthesizing classical geometry with vibrant cyberpunk colors, representing a digital playground of floating light spheres."
-  },
-  {
-    id: 4,
-    title: "Primal Shadows",
-    medium: "Mixed Media & Gold Leaf",
-    image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=2070&auto=format&fit=crop",
-    year: "2023",
-    dimensions: "24 x 36 inches",
-    location: "Private Collector (Delhi)",
-    description: "Using raw pigments, gold leaf, and structural gels, this artwork is an organic dance of light and shadow, reminding us of nature's primal forces."
-  },
-  {
-    id: 5,
-    title: "Architectural Mirage",
-    medium: "Giclée on Archival Paper",
-    image: "https://images.unsplash.com/photo-1551918120-9739cb430c6d?q=80&w=1974&auto=format&fit=crop",
-    year: "2024",
-    dimensions: "36 x 36 inches",
-    location: "London Exhibition Hall",
-    description: "A spatial illusion where architecture meets floating mirages, rendering depth and reflection with detailed vector precision."
-  },
-];
+
 
 interface InitialData {
   artistName: string;

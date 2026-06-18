@@ -6,7 +6,6 @@ import { PortfolioProvider, ThemeStyles } from "@/components/providers/portfolio
 import { getPortfolioData } from "@/app/actions";
 import "./globals.css";
 
-export const dynamic = "force-dynamic";
 
 const inter = Inter({
   variable: "--font-inter",

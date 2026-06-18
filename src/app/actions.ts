@@ -3,7 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { createHash } from "crypto";
+import { v2 as cloudinary } from "cloudinary";
 
+cloudinary.config({
+  secure: true
+});
 function hashPassword(password: string): string {
   return createHash("sha256").update(password).digest("hex");
 }
@@ -155,11 +159,19 @@ export async function addDbArtwork(artwork: {
   description: string;
 }) {
   try {
+    let imageUrl = artwork.image;
+    if (imageUrl.startsWith("data:image")) {
+      const uploadRes = await cloudinary.uploader.upload(imageUrl, {
+        folder: "portfolio_artworks"
+      });
+      imageUrl = uploadRes.secure_url;
+    }
+
     await prisma.artwork.create({
       data: {
         title: artwork.title,
         medium: artwork.medium,
-        image: artwork.image,
+        image: imageUrl,
         year: artwork.year,
         dimensions: artwork.dimensions,
         location: artwork.location,
@@ -185,12 +197,20 @@ export async function editDbArtwork(id: number, data: {
   description?: string;
 }) {
   try {
+    let imageUrl = data.image;
+    if (imageUrl && imageUrl.startsWith("data:image")) {
+      const uploadRes = await cloudinary.uploader.upload(imageUrl, {
+        folder: "portfolio_artworks"
+      });
+      imageUrl = uploadRes.secure_url;
+    }
+
     await prisma.artwork.update({
       where: { id },
       data: {
         title: data.title,
         medium: data.medium,
-        image: data.image,
+        ...(imageUrl && { image: imageUrl }),
         year: data.year,
         dimensions: data.dimensions,
         location: data.location,

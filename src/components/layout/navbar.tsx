@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
 import { Magnetic } from "@/components/ui/magnetic";
 import { usePortfolio } from "@/components/providers/portfolio-context";
 import { Menu, X } from "lucide-react";

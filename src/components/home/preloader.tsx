@@ -1,49 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-
+import { useEffect, useState } from "react";
 import { usePortfolio } from "@/components/providers/portfolio-context";
 
 export function Preloader() {
   const { artistName } = usePortfolio();
   const [progress, setProgress] = useState(0);
-  const preloaderRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLHeadingElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     let currentProgress = 0;
     let speed = 100;
     let timeoutId: NodeJS.Timeout;
 
-    const animateExit = () => {
-      const tl = gsap.timeline();
-      tl.to(textRef.current, {
-        y: -50,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power4.inOut",
-      })
-      .to(progressRef.current, {
-        opacity: 0,
-        duration: 0.5,
-        ease: "power2.inOut",
-      }, "-=0.6")
-      .to(preloaderRef.current, {
-        yPercent: -100,
-        duration: 1.2,
-        ease: "power4.inOut",
-      }, "-=0.2")
-      .set(preloaderRef.current, { display: "none" });
-    };
-
     const tick = () => {
       currentProgress += Math.floor(Math.random() * 12) + 6;
       if (currentProgress >= 100) {
         currentProgress = 100;
         setProgress(100);
-        animateExit();
+        setIsLoaded(true);
+        setTimeout(() => setIsHidden(true), 1200); // Wait for exit animation
       } else {
         setProgress(currentProgress);
         timeoutId = setTimeout(tick, speed);
@@ -53,7 +30,7 @@ export function Preloader() {
     timeoutId = setTimeout(tick, speed);
 
     const handleLoad = () => {
-      speed = 15; // Accelerate load progress once everything is ready
+      speed = 15;
     };
 
     if (document.readyState === "complete") {
@@ -68,23 +45,22 @@ export function Preloader() {
     };
   }, []);
 
+  if (isHidden) return null;
+
   return (
     <div 
-      ref={preloaderRef}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--color-background)]"
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--color-background)] transition-transform duration-[1200ms] ease-[cubic-bezier(0.87,0,0.13,1)] ${isLoaded ? "-translate-y-full delay-200" : ""}`}
     >
       <div className="overflow-hidden">
         <h1 
-          ref={textRef}
-          className="text-4xl md:text-6xl font-bold tracking-widest text-[var(--color-accent)] font-heading uppercase"
+          className={`text-4xl md:text-6xl font-bold tracking-widest text-[var(--color-accent)] font-heading uppercase transition-all duration-[800ms] ease-[cubic-bezier(0.87,0,0.13,1)] ${isLoaded ? "-translate-y-[50px] opacity-0" : ""}`}
         >
           {artistName}
         </h1>
       </div>
       
       <div 
-        ref={progressRef}
-        className="mt-8 flex flex-col items-center w-64"
+        className={`mt-8 flex flex-col items-center w-64 transition-opacity duration-500 ${isLoaded ? "opacity-0" : "opacity-100"}`}
       >
         <div className="w-full h-[1px] bg-[var(--color-surface)] relative overflow-hidden">
           <div 

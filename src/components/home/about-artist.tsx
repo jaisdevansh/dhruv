@@ -4,9 +4,8 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Magnetic } from "@/components/ui/magnetic";
-import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 import { usePortfolio } from "@/components/providers/portfolio-context";
-import aboutBg from "../../../public/images/about-bg.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -77,12 +76,13 @@ export function AboutArtist() {
         {/* Left: Interactive Image container */}
         <div className="w-full lg:w-1/2 aspect-[4/5] relative overflow-hidden rounded-2xl border border-white/[0.05] group">
           <div ref={imageRef} className="absolute inset-0 w-full h-full">
-            <Image
-              src={aboutBg}
+            <CldImage
+              src="portfolio/about-bg"
               alt="Artist studio painting workspace"
               fill
-              placeholder="blur"
               sizes="(max-width: 768px) 100vw, 50vw"
+              format="auto"
+              quality="auto"
               className="object-cover transition-transform duration-[1.5s]"
             />
           </div>
