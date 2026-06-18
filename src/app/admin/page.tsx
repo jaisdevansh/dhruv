@@ -255,7 +255,7 @@ export default function AdminPage() {
                 type="password"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter passcode (dhruv123)"
+                placeholder="Enter passcode"
                 className="w-full px-5 py-4 bg-white/[0.02] border border-white/[0.05] rounded-xl focus:border-[var(--color-accent)] focus:outline-none transition-all duration-300 font-sans tracking-widest text-center"
                 required
               />
